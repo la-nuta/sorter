@@ -1,6 +1,7 @@
 class Sorter {
     constructor() {
         this.wrapper = [];
+        this.comparator;
     }
 
     add(element) {
@@ -21,34 +22,39 @@ class Sorter {
     }
 
     sort(indices) {
-        let sortedArray = [];
-        for (let i = 0; i < indices.length; i++) {
-            sortedArray.push(this.wrapper[indices[i]]);
-        }
-        sortedArray.sort(
-            function (A, B) {
-                return A - B;
+        indices.sort();
+
+        for (let j = 0; j < indices.length; j++) {
+            if(indices[j] === indices[j+1]){
+                indices.splice(j, 1);
             }
-        );
-        return sortedArray;
+        }
+
+        if (indices.length > 1 && this.wrapper.length > 1 && this.wrapper.every(el => typeof el === 'number') && !this.comparator) {
+            let sortedArray = [];
+            for (let i = 0; i < indices.length; i++) {
+                sortedArray.push(this.wrapper[indices[i]]);
+            }
+            sortedArray.sort((a,b) => {return a - b});
+            for (let j = 0; j < indices.length; j++) {
+                this.wrapper[indices[j]] = sortedArray[j];
+            }
+        } else if (indices.length > 1 && this.wrapper.length > 1) {
+            let sortedArray = [];
+            for (let i = 0; i < indices.length; i++) {
+                sortedArray.push(this.wrapper[indices[i]]);
+            }
+            sortedArray.sort(this.comparator);
+            for (let j = 0; j < indices.length; j++) {
+                this.wrapper[indices[j]] = sortedArray[j];
+            }
+        }
+        return this.wrapper;
     }
 
     setComparator(compareFunction) {
-        return  this.wrapper.sort(compareFunction);
+        return this.comparator = compareFunction;
     }
 }
 
 module.exports = Sorter;
-
-// it('3', () => {
-//     sorter.add(7);
-//     sorter.add(6);
-//     sorter.add(5);
-//     sorter.sort([0, 1]);
-//
-//     assert.deepEqual(sorter.toArray(), [6, 7, 5]);
-//     assert.deepEqual(sorter.length, 3);
-//     assert.deepEqual(sorter.at(0), 6);
-//     assert.deepEqual(sorter.at(1), 7);
-//     assert.deepEqual(sorter.at(2), 5);
-// });
